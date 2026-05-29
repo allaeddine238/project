@@ -1,0 +1,17 @@
+{
+  "/api/ai-coach/route": "/api/ai-coach",
+  "/_not-found/page": "/_not-found",
+  "/api/meal-lookup/route": "/api/meal-lookup",
+  "/api/meal-parser/route": "/api/meal-parser",
+  "/ai-coach/page": "/ai-coach",
+  "/auth/page": "/auth",
+  "/auth/update-password/page": "/auth/update-password",
+  "/dashboard/page": "/dashboard",
+  "/exercises/page": "/exercises",
+  "/meals/page": "/meals",
+  "/onboarding/page": "/onboarding",
+  "/page": "/",
+  "/profile/page": "/profile",
+  "/progress/page": "/progress",
+  "/workouts/page": "/workouts"
+}

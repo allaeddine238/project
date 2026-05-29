@@ -1,0 +1,422 @@
+الجمهورية الجزائرية الديمقراطية الشعبية
+وزارة التعليم العالي والبحث العلمي
+Faculté : Technologie
+Département : Informatique
+Domaine : Mathématique-Informatique
+Filière : Informatique
+Spécialité : systèmes informatiques
+Mémoire
+Présenté en vue de l'obtention du Diplôme de
+Licence
+Thème
+Présenté par : BENTORKI Mohammed Abdelkader  &  BENTRIMA Alla Eddine
+Année Universitaire : 2025/2026
+Acknowledgements
+We would like to thank our supervisor, Dr. Hakim Amira, for her guidance and availability throughout this project. Her feedback shaped this work considerably, and her patience with our questions did not go unnoticed.
+We also thank the jury members for agreeing to review this report. Their observations will help us push this further.
+To the teaching staff of the Department of Computer Science at Badji Mokhtar – Annaba University: the foundation you gave us over three years is what made this project possible. To the Faculty of Technology and the university administration, thank you for providing the resources and space to work.
+We are grateful to the developer communities, open-source contributors, and fellow students who helped us work through the technical problems we ran into along the way.
+Finally, to our families — thank you for the patience, the support, and for not asking too many questions during the final weeks.
+Summary
+The picture that emerges from this review is clear. Among the platforms reviewed, no application was found that combines native support for traditional Algerian cuisine with AI-powered nutritional analysis while remaining accessible without a subscription-only paywall. Table 1.1 shows that, within the reviewed comparison set, Trackily was the only application identified as combining all six of these criteria at once. That distinction is not minor for the target user population — it is the difference between having a functional tool and not having one.
+Abstract
+This project sits at the intersection of digital health and software engineering. It tackles a concrete problem: mainstream nutrition and fitness apps systematically leave out traditional Algerian meals, which means that most Algerian users cannot log their actual diet without resorting to inaccurate food substitutions.
+To address this, we designed and built Trackily — a full-stack web application combining calorie and macronutrient tracking, workout planning, and progress analytics, with features not found together elsewhere: a curated database of traditional Algerian dishes, an AI-powered food parser, and a multilingual AI coaching module.
+The application was built with Next.js 15 and React 18 on the frontend, Supabase for backend storage and authentication, and the Groq API as the primary AI provider with a built-in local fallback for natural language meal parsing and conversational coaching. Users can describe one or several foods in plain text and receive an immediate breakdown of caloric and macronutrient content. The system calculates personalized caloric goals from user biometrics using the Mifflin-St Jeor formula, supports three interface languages (English, French, and Arabic), and includes a token-based usage system governing meal logging, AI interactions, and custom workout creation.
+The implemented prototype addresses all principal functional objectives of the project. It demonstrates that building a culturally inclusive digital health tool using accessible open-source technologies is technically feasible at prototype scale, and it opens a path toward expanding coverage to the broader Maghrebi culinary tradition and a native mobile application.
+Keywords: health informatics, nutrition tracking, traditional Algerian meals, macronutrients, web application, artificial intelligence, Next.js, Supabase, Groq API, multilingual, token system.
+Table of Contents
+Acknowledgements	i
+Summary	ii
+Abstract	iii
+Table of Contents	iv
+General Introduction	1
+Chapter 1: State of the Art	3
+1.1  Overview of Digital Health Applications	3
+1.2  AI-Powered Nutrition Tools	4
+1.3  Comparative Table of Similar Applications	5
+1.4  MyFitnessPal — A Prominent Comparable Platform	6
+Chapter 2: Design and Methodology	7
+2.1  System Architecture	7
+2.2  Type of Research	8
+2.3  Data Sources	8
+2.4  Tools and Technologies	9
+2.5  Development Methodology	9
+2.6  Database Schema	10
+2.7  Application Modules	10
+Chapter 3: Implementation, Results and Discussion	11
+3.1  Implementation Environment	11
+3.2  Application Screens	11
+3.3  Results	13
+3.4  Discussion	14
+General Conclusion and Perspectives	15
+Bibliography	17
+Annexes	19
+General Introduction
+1.  General Context
+Over the past decade, health informatics has moved from hospital systems to people's pockets. Smartphone adoption, cheaper data, and a measurable global rise in lifestyle diseases like obesity, type-2 diabetes, and cardiovascular conditions have together created real demand for personal health management tools [1]. The World Health Organization identifies poor nutrition and physical inactivity among the leading preventable causes of premature death worldwide [2] — which partly explains why nutrition and fitness apps have become one of the fastest-growing software categories.
+These applications generally do what they promise: they let users track what they eat, how much they exercise, and how their body metrics change over time. What they don't do well is serve users whose diet is rooted in food traditions outside the Western mainstream.
+Several structural reasons explain this gap. Nutritional databases used by mainstream applications are built incrementally from user contributions and manufacturer data, both of which are heavily concentrated in Western markets [6]. Traditional dishes from North Africa, the Middle East, and Sub-Saharan Africa are systematically underrepresented because the communities that consume them have historically had lower digital health engagement. This is changing rapidly — Algeria's internet penetration reached approximately 71% in early 2023 according to DataReportal — but the nutritional databases have not kept pace [4].
+A second structural problem is the absence of a standardized nutritional reference for Algerian cuisine. Unlike the USDA FoodData Central database in the United States, no equivalent open national database exists for Algerian dishes. The closest reference — the ONS Algeria dietary survey — provides aggregate consumption data but not standardized per-serving macronutrient values suitable for integration into a tracking application [12].
+2.  Problem Statement
+In Algeria and across the Maghreb, daily eating is built around dishes like Couscous au Poulet, Chakhchoukha, Rechta, Harira, and Chorba Frik. These are not edge cases — they're what people actually eat. Yet they are largely absent from the databases of the major tracking apps surveyed, including MyFitnessPal, Cronometer, and Lifesum [3].
+The practical result is that Algerian users who want to track their calories are forced to log guesses — picking the closest Western equivalent and hoping the numbers are roughly right. They almost never are. Among the platforms surveyed, none combines a dedicated traditional Algerian meal database with AI-powered nutritional analysis in a single application accessible without a subscription-only paywall. That gap is what this project addresses.
+Central research question: How can a web application effectively support health and fitness tracking while integrating accurate macronutrient data for traditional Algerian meals and AI-powered nutritional analysis?
+3.  Objectives
+The main objective is to design and develop Trackily — a full-stack web application that closes the identified gap. More specifically, this project set out to:
+Survey existing health and nutrition applications and identify their blind spots around regional food coverage
+Build a responsive, multilingual interface for tracking daily calories, macronutrients, body weight, and fitness progress
+Integrate an AI-powered food parser and conversational coaching module using the Groq API with a built-in local fallback
+Compile a curated database of traditional Algerian meals with per-serving macronutrient values compiled from published nutritional references
+Evaluate the application's usability, accuracy, and functional completeness
+4.  Research Questions
+What are the main gaps in existing health apps when it comes to regional food coverage?
+How can large language models be integrated into a web application for real-time nutritional estimation?
+What architecture best suits a multi-feature health tracking platform with AI capabilities?
+How does Trackily perform in terms of usability and nutritional tracking accuracy?
+5.  Report Structure
+Chapter 1 reviews the current state of digital health applications and AI-powered nutritional tools. Chapter 2 covers the design, architecture, methodology, and technology choices behind Trackily. Chapter 3 documents the implementation, presents the results, and discusses their meaning. A general conclusion wraps up the main contributions and maps out what comes next.
+Chapter 1: State of the Art
+1.1  Overview of Digital Health Applications
+The global digital health market has been growing rapidly, driven by smartphone adoption, chronic disease prevalence, and expanding digital infrastructure; multiple market analyses project sustained double-digit annual growth through 2030 [4]. Nutrition and fitness tracking apps are one of the most active segments within that market.
+Platforms like MyFitnessPal, Cronometer, Lifesum, and Noom have established themselves as category leaders. They offer calorie counting, macronutrient logging, workout tracking, and progress charts [5]. MyFitnessPal alone has over 200 million registered users and a food database of approximately 18–20 million items [11] — most concentrated in Western food categories.
+The cultural gap shows up consistently. Users from North African, Sub-Saharan, and Middle Eastern backgrounds regularly run into missing entries for their staple foods. The workarounds they use — substituting foreign foods or estimating from memory — produce unreliable data and erode trust in the tool over time [3][6].
+1.2  AI-Powered Nutrition Tools
+AI has entered the nutrition space through three distinct approaches:
+Image recognition: Apps like Calorie Mama and Snap Calorie use convolutional neural networks to identify foods from photos and estimate their nutritional content [8]. These systems struggle with traditional dishes that weren't in their training data — which describes most Algerian food.
+Natural language processing: Large language models including GPT-4 and Anthropic's Claude can estimate nutritional values from plain-text meal descriptions [9]. This is especially useful for dishes that have no photographic reference data in any system.
+Recommendation engines: Machine learning algorithms suggest personalized dietary adjustments based on logged history, health goals, and biometric parameters [10].
+Trackily uses the NLP approach. A user can type one or several foods in plain text — any meal, including culturally specific dishes absent from any standard database — and the AI food parser returns individual caloric and macronutrient breakdowns. Processing is handled by the Groq API when configured, with a built-in local parser activating as a fallback.
+Each approach carries specific tradeoffs. Image recognition systems offer the most intuitive user experience but require large labeled training sets of each food category; Algerian dishes are absent from virtually all publicly available food image datasets. Recommendation engines are most useful at scale — their value increases with longitudinal data — and may be considered in future iterations of Trackily once a sufficient user base is established. The NLP approach was selected for the current version because it requires no specialized training data and can immediately handle any culturally specific dish that a user can describe in natural language.
+1.3  Comparative Table of Similar Applications
+Table 1.1 compares Trackily against the most relevant existing platforms across six criteria:
+Table 1.1: Comparison of existing health and nutrition applications. (Token System column indicates whether an in-app usage or monetization mechanism is present.)
+1.4  MyFitnessPal — A Prominent Comparable Platform
+MyFitnessPal has progressively introduced AI-powered features, including voice logging and, most recently, an AI meal planner announced in early 2025 following the acquisition of a meal-planning startup [11]. It is among the closest commercial analogues to what Trackily does, but several differences remain significant:
+Its advanced AI features sit behind a paid subscription (starting at USD 19.99/month for Premium), which limits accessibility for most users in the target demographic
+It works only as a recommendation tool within MFP's existing database — it cannot process a free-text description of an unrecognized dish
+It has zero coverage of traditional Algerian or Maghrebi cuisine
+Trackily's AI module accepts any meal description in natural language, including culturally specific dishes, and returns a nutritional estimate immediately, within the user's daily token allowance.
+Chapter 2: Design and Methodology
+2.1  System Architecture
+Trackily is organized into four layers:
+Presentation Layer: A Next.js 15 application with React 18, using the App Router for page-based navigation, handling all user interactions, UI rendering, multilingual support, and dark/light theming
+Application Layer: Server-side and client-side logic including authentication flows, profile management, calorie goal calculation, token management, and Next.js API routes for the AI coach and meal parser
+Data Layer: A PostgreSQL relational database hosted on Supabase, with Row-Level Security enforced on all tables, storing user profiles, meal logs, weight records, AI conversations, custom workouts, and token transactions
+AI Integration Layer: Groq API as the primary provider for natural language meal parsing and conversational coaching, with a built-in local fallback that activates when the remote provider is unavailable
+This architecture was chosen for its rapid development capabilities, cost profile, and production-readiness. Supabase's free tier provides sufficient infrastructure for a prototype at this scale, and Next.js's full-stack model allows API routes and frontend code to coexist in a single project, reducing integration complexity and enabling both server-side rendering and client-side interactivity.
+The decision to adopt a server-side API route pattern for AI interactions, rather than calling the Groq API directly from the client, was driven by two considerations. First, it keeps authentication credentials server-side, preventing exposure of the API key in client-side code. Second, it provides a single interception point where the fallback logic can be applied consistently, regardless of which frontend component triggered the request.
+The multilingual architecture relies on a centralized translation context that wraps the entire application. Language preference is managed in application state and persisted locally in the browser (localStorage), so users do not need to re-select their language on each visit. Selecting Arabic triggers RTL layout adjustments applied at the component level.
+2.2  Type of Research
+This is applied research in software engineering and health informatics. The approach is constructive: we identified a real-world problem, reviewed existing solutions, designed and built a new system, and evaluated its functional performance. Chapter 1 handles the comparative dimension; Chapter 3 handles the descriptive analysis of results.
+2.3  Data Sources
+Three categories of data are used in the application:
+Traditional Algerian Meal Data: A curated dataset of 12 traditional dishes with per-serving values for calories, protein, carbohydrates, and fat, compiled from published nutritional references [12].
+User-Generated Data: Profile data (age, weight, height, gender, goal), daily meal logs, weight records, custom workouts, and AI coach conversation history — all stored in Supabase.
+AI-Generated Data: Real-time nutritional estimates and coaching responses produced by the Groq API, with a local fallback generating structured estimates when the remote provider is unavailable.
+2.4  Tools and Technologies
+Table 2.1: Technologies and tools used in Trackily.
+2.5  Development Methodology
+An iterative incremental methodology was applied across four phases:
+Analysis Phase: Literature review, requirements definition, and comparative study of existing applications
+Design Phase: System architecture, database schema, UI/UX wireframing, and API integration planning
+Implementation Phase: Next.js frontend and API routes, Supabase backend and auth integration, Groq API and local fallback, and progressive feature rollout
+The iterative model was particularly well-suited to this project because several design decisions — including the choice of AI provider, the structure of the token system, and the scope of the workout module — evolved through implementation rather than being fully specified in advance. Each phase produced testable deliverables that informed the next: the database schema was first validated during the authentication phase, the meal logging logic was stress-tested before the AI parser was layered on top of it, and the token system was integrated after the core feature set was stable.
+Evaluation Phase: Functional testing, usability review, and performance checks
+2.6  Database Schema
+The Supabase PostgreSQL database uses eight primary tables, organized to support all current application features:
+profiles: User biometric data (name, age, weight, height, gender, goal), daily caloric goal, and all token-management fields — token_balance, token_daily_allowance, token_last_refresh, token_total_spent — alongside active plan fields (plan name, period, token allocation, renewal date, and payment method); the primary key references auth.users directly
+meals: Individual meal log entries per user, storing meal name, calories, protein, carbohydrates, fat, meal type (breakfast, lunch, dinner, or snack), log date, and timestamps
+weight_logs: One body weight entry per user per date, used to build the weight progress chart
+conversations and messages: Persisted AI coach chat sessions and their individual message records, stored by user
+user_workouts: Custom workout routines built and saved by the user, stored as structured JSON in the database
+token_purchase_requests: Records of user purchase requests for token packs and plans, including purchase type, package details, pricing (DZD and USD), payment method, and approval status
+token_transactions: A full ledger of all token balance changes — daily refreshes, usage deductions, and purchase credits — each record storing change_amount, balance_after, reason, and source_type
+Row-Level Security policies are enforced on all tables. Users can only read and write their own records, ensuring strict data isolation across accounts.
+Row-Level Security (RLS) is implemented at the PostgreSQL level through Supabase's policy engine. Each table has INSERT, SELECT, UPDATE, and DELETE policies that bind operations to the authenticated user's UUID — the same UUID issued by Supabase Auth at registration. This means that even if an application-level bug produced an incorrect user_id in a query, the database layer would reject the operation. The conversations and messages tables additionally enforce cascade deletion, so removing a conversation automatically removes all its child messages without requiring application-level cleanup.
+The token system is implemented across three profile fields (token_balance, token_daily_allowance, token_total_spent) and a token_transactions table. Each action that consumes a token — logging a meal (from any source), sending an AI coach message, or saving a custom workout — writes a record to token_transactions with source_type set to 'usage', decrements token_balance in profiles, and increments token_total_spent. Daily refreshes produce records with source_type 'daily_refresh'; token pack and plan activations use 'purchase' or 'plan_renewal'. This transaction log provides a complete audit trail of balance changes throughout the user's session history.
+2.7  Application Modules
+The application has nine functional modules:
+Authentication Module: Email/password registration and login via Supabase Auth, with persistent JWT sessions
+Onboarding Module: A two-step wizard collecting biometric data and fitness goals, with real-time BMI value display and visual colour indication, and caloric target calculation using the Mifflin-St Jeor formula
+Dashboard Module: Daily overview showing caloric progress, macro summary indicators for protein, carbohydrates, and fat, today's meal entries grouped by meal type, a weekly calorie chart, token balance summary, and quick navigation cards to the main sections
+Meals Module: Meal logging from a curated traditional Algerian meal database (12 dishes), and an AI food parser that accepts free-text multi-food input; processed via Groq with a built-in local fallback; supports breakfast, lunch, dinner, and snack logging
+Exercises Module: A categorized exercise library covering chest, back, shoulders, arms, legs, glutes, core, and full body, for both home and gym settings
+Workouts Module: Four starter workout plans (Upper Body Power, Lower Body Blast, Core Control, Full Body Engine) and a custom workout builder; saved workouts are persisted in the database and can be edited or deleted; saving a new custom workout consumes a token
+Progress Module: Weekly calorie chart, weight log progress chart, logging streak, goal-hit count, average calorie calculation, and achievement-style summary cards
+AI Coach Module: Conversational coaching assistant using Groq (with local fallback); conversation history is persisted in the database; supports multiple chat sessions; detects Arabic and can respond in Arabic; sending a message consumes a token
+Profile Module: User identity, body stats, editable biometric fields, calorie goal recalculation, token balance and plan information, theme switching, language switching, and sign-out
+Chapter 3: Implementation, Results and Discussion
+3.1  Implementation Environment
+Operating System: Modern desktop environment (development conducted on a standard desktop OS)
+Browser: Modern desktop browser (Chrome and Firefox used for development and testing)
+IDE: Visual Studio Code (current stable release)
+Node.js: v20 LTS
+Supabase: Free tier — 500 MB database, 50,000 monthly active users
+Groq API: accessed via REST with Bearer token authentication through a Next.js server-side API route; local fallback logic activates when the provider is unavailable
+3.2  Application Screens
+3.2.1  Authentication and Onboarding
+The authentication flow is a sign-up / sign-in form followed by a two-step onboarding wizard. In Step 1, the user enters their biometric data (gender, age, weight, height) and sees a real-time BMI value with visual colour indication. In Step 2, the user picks a fitness goal, and the app calculates a personalized daily caloric target using the Mifflin-St Jeor equation multiplied by an activity factor of 1.55, then adjusted by +/-300-500 kcal based on the selected goal.
+3.2.2  Dashboard
+The main dashboard gives a consolidated daily view: a user greeting, a caloric progress indicator showing consumed versus remaining calories, macro summary indicators for protein, carbohydrates, and fat, a list of today's logged meals grouped by meal type (breakfast, lunch, dinner, snack), a weekly calorie history chart, and a token balance summary. Quick navigation cards link directly to the Meals, Workouts, and AI Coach sections.
+3.2.5  Progress Module
+The progress module presents analytics built from the user's historical data. The weekly calorie chart renders a bar chart of daily caloric intake over the past seven days, sourced from the meals table. The weight chart plots the user's logged body weight over time, drawing from the weight_logs table. Beneath the charts, summary cards display the current logging streak (consecutive days with at least one meal logged), the number of days the user's calorie intake fell within the target range (goal hit count), and the rolling average daily caloric intake. These metrics give users a structured view of consistency and adherence without requiring manual calculation.
+3.2.6  AI Coach Module
+The AI coach page provides a persistent, multi-session conversational interface. If no active conversation exists, the app creates a default conversation titled “New Chat” and adds a welcome message. After the user sends their first message, the conversation title is updated from that message. Previous conversations are accessible through a toggleable conversation list on the page. Selecting a conversation loads its full message history from the messages table. Messages are sent through a Next.js API route that forwards the current conversation context and user profile data to the Groq API; the local fallback activates if Groq is unreachable. Arabic-language input is detected at the API level and causes the coach to respond in Arabic. Each message sent consumes one token from the user's balance.
+3.2.7  Profile Module
+The profile page gives users full visibility and control over their account. The upper section displays the user's name, email, and membership details alongside their current token balance and active plan. The biometric section shows the current values for age, weight, height, gender, and fitness goal, each editable through inline form fields. Saving updated biometrics triggers a recalculation of the daily caloric goal using the same Mifflin-St Jeor formula applied during onboarding. The lower section provides controls for switching the interface language (English, French, Arabic), toggling the visual theme (dark or light), and signing out.
+3.2.3  Meals Module
+The meals module offers two logging pathways. The first is the traditional Algerian meal database, presenting 12 dishes with images, origin labels, and selectable amounts (by grams or unit). The second is the AI food parser: the user types one or several foods in a single sentence — for example, “2 eggs and a banana” — and the parser splits and identifies each item individually. Processing is handled by the Groq API when configured; a built-in local parser activates as a fallback. Common foods including eggs, chicken breast, rice, Greek yogurt, almonds, and others are recognized by the local parser. Each logged entry is assigned a meal type and contributes to the daily macronutrient totals. Each meal log consumes one token, whether entered through the AI parser or selected from the traditional meal database.
+3.2.4  Workouts Module
+The workouts module presents four starter workout cards — Upper Body Power, Lower Body Blast, Core Control, and Full Body Engine — each displaying the target muscle group and difficulty level. Users can browse the exercise library to view exercises by category and muscle group. The custom workout builder allows users to assemble their own routine by selecting exercises from the exercise library and assigning a workout name, notes, muscle group focus, and location (home or gym). The builder reuses exercise metadata already defined in the library; it does not expose a free-form custom reps-and-sets editor. Saved workouts are stored in the database and appear in a personal list where they can be edited or deleted. Creating and saving a new custom workout consumes one token.
+3.3  Results
+3.3.1  Traditional Algerian Meal Database
+Table 3.1: Traditional Algerian meal database (values per serving).
+3.3.2  Caloric Goal Calculation
+For a representative male user aged 25, weighing 75 kg, and measuring 175 cm:
+BMR  =  10 x 75  +  6.25 x 175  -  5 x 25  +  5  =  1,724 kcal/day
+TDEE  =  1,724 x 1.55  =  2,672 kcal/day
+Lose Weight: 2,172  |  Maintain: 2,672  |  Build Muscle: 2,972 kcal/day
+3.3.3  Token System Implementation
+The token system governs access to AI-assisted features and custom workout creation. Each authenticated user receives a daily allowance of 10 tokens, replenished at the start of each day. The three actions that consume tokens are: logging a meal (1 token, regardless of whether the entry comes from the AI food parser or the traditional meal database), sending a message to the AI coach (1 token), and saving a new custom workout (1 token). Users who require higher daily usage can activate a plan through the token purchase flow: the Starter Pack (20 tokens), Popular Pack (50 tokens), and Power Pack (100 tokens) are available as one-time additions. Active plans — Daily Pass, Monthly Pass, and Yearly Pass — grant unlimited access for their duration.
+Payment requests are stored in the token_purchase_requests table, and all token changes are logged in token_transactions. At the current development stage, this system serves as an access-control and accounting mechanism rather than a live commercial payment gateway. It is designed to be extensible: integration with a payment processor could be layered onto the existing purchase request schema without requiring structural changes to the database.
+3.3.4  Starter Workout Plans
+Upper Body Power: Focused on chest, back, and shoulder development
+Lower Body Blast: Designed for lower body conditioning, targeting quads, hamstrings, and glutes
+Core Control: Core-focused routine covering abdominals and stabilizer muscles
+Full Body Engine: A compound movement routine targeting all major muscle groups
+3.4  Discussion
+3.4.1  Interpretation
+The core features defined in the requirements phase were implemented and functional in the prototype. The traditional meal database covers 12 representative Algerian dishes spanning multiple meal categories, providing nutritional data that is absent from the reviewed mainstream platforms.
+The AI food parser demonstrated a meaningful design improvement over a single fixed-database approach. By combining Groq-powered natural language processing with a local rule-based fallback, the module handles multi-item meal input and provides reasonable nutritional estimates even when the remote API is unavailable. This resilience is significant for a prototype system designed to operate under variable connectivity conditions. The persisted AI coach conversations also represent an improvement over a stateless chat widget: users can return to prior discussions, creating a more coherent and personalized experience over time.
+3.4.2  Comparison with the Literature
+Compared to what was reviewed in Chapter 1, Trackily's design aligns with the broader trend toward AI-enhanced health applications [7], while directly addressing the cultural inclusivity gap in nutritional databases for North African cuisines [3]. The NLP-based estimation approach draws on the growing body of research on the practical feasibility of using LLMs for dietary guidance [9].
+Unlike MyFitnessPal's AI features [11], which sit behind a paid subscription tier, Trackily's AI parser is accessible through a daily token allowance and can handle foods described in natural language, including dishes absent from any predefined database. For the target user population, that difference is not cosmetic.
+This comparison also illustrates a broader pattern: AI features in commercial health applications are frequently positioned as premium add-ons. Noom's coaching model, Lifesum's personalized plans, and MyFitnessPal's AI suggestions all require paid subscriptions. For users in Algeria, where premium subscription costs comparable to those charged by the platforms above represent a non-trivial share of discretionary spending, this paywall structure is not a minor friction — it is an exclusion. Trackily's design explicitly rejects this model. The token system implemented in the current version grants users a daily allowance, providing limited initial access by default without requiring a subscription-only plan.
+3.4.3  Limitations
+Several limitations are worth stating clearly. First, the AI nutritional estimates — whether from Groq or the local fallback — are probabilistic and not laboratory-validated. The local fallback in particular relies on a fixed dataset of common foods and is less robust than a fully integrated external nutrition API. Second, the traditional Algerian meal database covers 12 dishes; Algeria's regional culinary diversity extends well beyond that, and the current dataset is a starting point rather than a complete picture. Third, the token and payment flow is implemented as an in-app request system and should not be characterized as a production-grade commercial billing infrastructure. It functions as an access-control mechanism appropriate to a prototype at this scale.
+General Conclusion and Perspectives
+1.  Recall of Context and Problem
+This project addressed a specific, well-documented gap: traditional Algerian and Maghrebi dishes are not meaningfully represented in the nutritional databases of the major health tracking platforms reviewed. That gap is not a minor inconvenience — it makes these tools unreliable for a population of users whose dietary tracking depends on data that does not exist in those platforms.
+The research question this work was built around: how can a web application effectively support health and fitness tracking while integrating accurate macronutrient data for traditional Algerian meals and AI-powered nutritional analysis?
+2.  Achieved Objectives
+The following implementation objectives were achieved in the prototype:
+A curated database of 12 traditional Algerian meals with per-serving macronutrient values compiled from published references was assembled
+A full-stack Next.js 15 application with dark/light mode theming and trilingual support (Arabic, French, English) was built
+An AI food parser using the Groq API with a built-in local fallback was integrated and verified functional for multi-food free-text input
+A workouts module with four starter plans, a custom workout builder, and persistent workout storage in the database was implemented; token consumption on save was integrated
+Persistent data storage and authentication via Supabase were deployed
+A personalized caloric goal engine based on the Mifflin-St Jeor BMR formula was implemented
+3.  What the Results Show
+Trackily does what it was designed to do. Users can log traditional Algerian meals with real nutritional data, describe multiple foods in plain text and receive immediate per-item nutritional estimates, build and save custom workouts by selecting from the exercise library, interact with a multilingual AI coach across persistent conversations, track body weight progress, and monitor their calories and macronutrients against a goal tailored to their biometrics. Among the reviewed platforms, none offers this combination — in Arabic, French, and English — within a token-based model with a daily allowance and optional packs and plans.
+The combination of a Groq-powered parser and a local fallback showed that a resilient, dual-mode AI integration is achievable in a full-stack web application without requiring a continuously available external provider. This design pattern — remote AI primary, local logic fallback — has practical value beyond this project and could be adapted for other nutrition or health informatics tools with similar constraints.
+4.  Contributions
+A working, culturally adapted digital health application built with accessible open-source technologies
+A Groq-powered AI food parser with local fallback, demonstrated in a full-stack web application context as a viable approach to culturally inclusive nutritional estimation
+A macronutrient dataset for 12 traditional Algerian dishes compiled from published nutritional references, available for reuse in future research
+Documentation of the cultural inclusivity gap in existing health apps, contributing to the health informatics literature
+5.  Limitations
+AI nutritional estimates — whether from Groq or the local fallback — are probabilistic and not laboratory-validated; the local fallback is less robust than a dedicated external nutrition API
+The traditional meal database covers 12 entries; Algeria's regional culinary diversity runs much deeper
+The token and payment flow is an in-app request system appropriate to a prototype scale and should not be overstated as a production-grade commercial billing infrastructure
+Evaluation was conducted in a prototype setting and has not been validated with a live user population at scale
+6.  Future Perspectives
+Expand the traditional meal database to cover all 48 Algerian wilayas and the broader Maghrebi tradition
+Integrate image-based meal recognition using computer vision APIs
+Develop a native mobile application for Android and iOS using React Native
+Run a large-scale user study to validate AI nutritional estimates against laboratory measurements
+Collaborate with certified nutritionists to validate and enrich the macronutrient dataset
+Add social features — meal sharing, group challenges, leaderboards
+Bibliography
+Reference style: IEEE  |  Total: 20 references
+[1]  WHO, "Global Health Observatory - Physical Inactivity and Non-Communicable Diseases," World Health Organization, Tech. Rep., 2022.
+[2]  WHO, "Noncommunicable diseases: Key facts," World Health Organization, 2023. [Online]. Available: https://www.who.int. [Accessed: Mar. 2025].
+[3]  F. Alkerwi, "Challenges of dietary assessment in developing countries: a focus on North African cuisines," Nutrition Journal, vol. 14, no. 1, pp. 1-9, 2015.
+[4]  Grand View Research, "Digital Health Market Size, Share & Trends Analysis Report," Market Report GVR-1-68038-851-3, 2023.
+[5]  J. R. Lieffers and R. M. Hanning, "Dietary assessment and self-monitoring with nutrition applications for mobile devices," Canadian Journal of Dietetic Practice and Research, vol. 73, no. 3, pp. e253-e260, 2012.
+[6]  C. M. Wharton et al., "Dietary self-monitoring but not dietary quality improves with use of smartphone app technology in an 8-week weight loss trial," Journal of Nutrition Education and Behavior, vol. 46, no. 5, pp. 440-444, 2014.
+[7]  T. Chen, B. Xu and C. Yu, "Artificial Intelligence in Digital Health: Opportunities and Challenges," IEEE Transactions on Neural Networks and Learning Systems, vol. 33, no. 2, pp. 456-470, 2022.
+[8]  M. Anthimopoulos et al., "Segmentation and recognition of multi-food meal images for carbohydrate counting," in Proc. IEEE EMBC, Milan, 2015, pp. 6375-6378.
+[9]  A. Deen, C. Bhosle and R. Narahari, "Personalized Nutrition: Leveraging LLMs for Dietary Guidance," in Proc. IEEE HEALTHCOM, Boston, 2023, pp. 210-218.
+[10] P. Shokrollahi et al., "A Review of Wearable Sensors and IoT Solutions for Monitoring Physical Activity," IEEE Sensors Journal, vol. 21, no. 8, pp. 9923-9937, 2021.
+[11] MyFitnessPal Inc., "MyFitnessPal to Offer Personalized AI Meal Planning," Bloomberg / MyFitnessPal Blog, Feb. 2025. [Online]. Available: https://blog.myfitnesspal.com. [Accessed: Mar. 2025].
+[12] Office National des Statistiques Algerie, "Enquete nationale sur la consommation alimentaire," ONS, Alger, Tech. Rep., 2023.
+[13] Groq Inc., "Groq API Documentation," 2024. [Online]. Available: https://console.groq.com/docs. [Accessed: Mar. 2025].
+[14] Supabase Inc., "Supabase Documentation," 2024. [Online]. Available: https://supabase.com/docs. [Accessed: Mar. 2025].
+[15] Vercel Inc., "Next.js Documentation - The React Framework for the Web," 2024. [Online]. Available: https://nextjs.org/docs. [Accessed: Mar. 2025].
+[16] Recharts, "Recharts - Redefined chart library built with React and D3," 2024. [Online]. Available: https://recharts.org. [Accessed: Mar. 2025].
+[17] T. Brown et al., "Language Models are Few-Shot Learners," in Proc. NeurIPS, 2020, pp. 1877-1901.
+[18] E. Topol, "High-performance medicine: the convergence of human and artificial intelligence," Nature Medicine, vol. 25, pp. 44-56, 2019.
+[19] N. V. Dhurandhar et al., "Energy balance measurement: When something is not better than nothing," International Journal of Obesity, vol. 39, no. 7, pp. 1109-1113, 2015.
+[20] S. Pande et al., "Full-Stack Web Application Development with React and Node.js," International Journal of Computer Applications, vol. 175, no. 12, pp. 30-35, 2020.
+Annexes
+Annex A: Mifflin-St Jeor BMR Formula
+The formula used by Trackily to compute the user's Basal Metabolic Rate (BMR):
+Male:    BMR = 10 x W + 6.25 x H - 5 x A + 5
+Female:  BMR = 10 x W + 6.25 x H - 5 x A - 161
+Where W = weight (kg), H = height (cm), A = age (years).
+TDEE = BMR x 1.55
+Lose Weight: TDEE - 500  |  Maintain: TDEE  |  Build Muscle: TDEE + 300
+Annex B: Full Technology Stack
+Table A.1: Trackily full technology stack.
+Annex C: Database Schema (SQL Extract)
+-- profiles
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT,
+  age INTEGER,
+  weight NUMERIC(5,1),
+  height NUMERIC(5,1),
+  gender TEXT CHECK (gender IN ('male','female')),
+  goal TEXT CHECK (goal IN ('lose','maintain','gain')),
+  daily_calorie_goal INTEGER,
+  token_balance INTEGER DEFAULT 10,
+  token_daily_allowance INTEGER DEFAULT 10,
+  token_last_refresh DATE DEFAULT CURRENT_DATE,
+  token_total_spent INTEGER DEFAULT 0,
+  active_plan_id TEXT,
+  active_plan_name TEXT,
+  active_plan_period TEXT CHECK (active_plan_period IN ('daily','monthly','yearly')),
+  active_plan_tokens INTEGER,
+  active_plan_renews_at TIMESTAMPTZ,
+  active_plan_payment_method TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+-- meals
+CREATE TABLE meals (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  calories INTEGER NOT NULL DEFAULT 0,
+  protein NUMERIC(6,1) DEFAULT 0,
+  carbs NUMERIC(6,1) DEFAULT 0,
+  fat NUMERIC(6,1) DEFAULT 0,
+  meal_type TEXT DEFAULT 'lunch'
+    CHECK (meal_type IN ('breakfast','lunch','dinner','snack')),
+  log_date DATE DEFAULT CURRENT_DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- weight_logs
+CREATE TABLE weight_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  weight NUMERIC(5,1) NOT NULL,
+  log_date DATE DEFAULT CURRENT_DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (user_id, log_date)
+);
+
+-- conversations
+CREATE TABLE conversations (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  title TEXT DEFAULT 'New Chat',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- messages
+CREATE TABLE messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  conversation_id UUID REFERENCES conversations ON DELETE CASCADE NOT NULL,
+  role TEXT CHECK (role IN ('user','assistant')) NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+-- user_workouts
+CREATE TABLE user_workouts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  muscle_group TEXT NOT NULL,
+  location TEXT NOT NULL,
+  notes TEXT DEFAULT '',
+  items JSONB NOT NULL DEFAULT '[]'::JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- token_purchase_requests
+CREATE TABLE token_purchase_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  purchase_type TEXT NOT NULL CHECK (purchase_type IN ('pack','plan')),
+  package_id TEXT NOT NULL,
+  package_name TEXT NOT NULL,
+  billing_period TEXT,
+  tokens INTEGER NOT NULL,
+  price_dzd INTEGER NOT NULL,
+  price_usd NUMERIC(8,2) NOT NULL,
+  payment_method TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'approved'
+    CHECK (status IN ('pending','approved','rejected')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- token_transactions
+CREATE TABLE token_transactions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  change_amount INTEGER NOT NULL,
+  balance_after INTEGER,
+  reason TEXT NOT NULL,
+  source_type TEXT NOT NULL
+    CHECK (source_type IN ('daily_refresh','usage','purchase','plan_renewal')),
+  source_label TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+[TABLE 0]
+Université Badji Mokhtar - Annaba Badji Mokhtar – Annaba University |  | جامعة باجي مختار – عنابـــــــــــة
+
+[TABLE 1]
+Health, Fitness, and Nutrition Web Application with Traditional Algerian Meal Macronutrient Tracking
+
+[TABLE 2]
+Encadrant : HAKIM AMIRA. | Doctor | Université Badji Mokhtar – Annaba
+
+[TABLE 3]
+Application | Trad. Meals | AI Analysis | Workout | Token System | Multilingual | No Paywall
+MyFitnessPal | No | No | Yes | No | Partial | Limited
+Cronometer | No | No | Yes | No | No | Yes
+Lifesum | No | No | Yes | No | Partial | Limited
+Lose It! | No | Partial | Yes | No | No | Limited
+Calorie Mama | No | Yes (image) | No | No | No | Limited
+Noom | No | No | No | No | No | No
+Yazio | No | No | Yes | No | Partial | Limited
+Trackily (ours) | Yes (Algerian) | Yes (text / AI) | Yes | Yes | Yes | Yes
+
+[TABLE 4]
+Technology | Version / Source | Role in Project
+Next.js 15 / React 18 | v15 / v18 — nextjs.org | Full-stack framework (App Router, API routes, SSR)
+Recharts | Latest — recharts.org | Data visualization (calorie charts, weight progress)
+Supabase | Cloud — supabase.com | Authentication, PostgreSQL database, REST API
+Groq API | Cloud — console.groq.com | AI meal parser and coach API (with local fallback)
+JavaScript ES2022 | Native (browser) | Core application logic
+Tailwind CSS / CSS Modules | Component styling, dark/light theming, multilingual layout
+Git / GitHub | Latest | Version control and collaboration
+
+[TABLE 5]
+Meal Name | Category | Calories | Protein (g) | Carbs (g) | Fat (g) | Region
+Chakhchoukha | Main | 520 | 24 | 68 | 16 | Biskra
+Couscous Poulet | Main | 480 | 32 | 58 | 12 | National
+Rechta | Main | 410 | 22 | 52 | 10 | Algiers
+Mhadjeb | Snack | 320 | 10 | 45 | 12 | Constantine
+Harira | Soup | 180 | 9 | 28 | 4 | Maghreb
+Merguez | Protein | 290 | 18 | 2 | 24 | National
+Baghrir | Breakfast | 220 | 6 | 40 | 5 | National
+Berkoukes | Main | 390 | 18 | 55 | 8 | Oasis
+Bourek | Appetizer | 260 | 12 | 30 | 11 | Algiers
+Makroud | Dessert | 380 | 5 | 58 | 16 | Kairouan
+Chorba Frik | Soup | 210 | 14 | 26 | 5 | National
+Dolma Waraq | Main | 240 | 10 | 32 | 9 | East Algeria
+
+[TABLE 6]
+Layer | Technology | Description
+Frontend | Next.js 15 + React 18 | Full-stack React framework with server-side rendering, App Router, and API routes
+Styling | CSS-in-JS | CSS Modules and inline styles with dynamic dark/light theming
+Backend | Supabase | Managed PostgreSQL with REST API and row-level security
+AI Engine | Groq API (local fallback) | LLM API for free-text meal analysis and AI coaching
+Auth | Supabase Auth | Email/password authentication with JWT session management
+Hosting | Vercel / Netlify | Full-stack deployment via Vercel with support for Next.js App Router and server-side API routes

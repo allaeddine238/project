@@ -1,7 +1,6 @@
 'use client'
 
-// Global app state lives here.
-// It handles auth, profile data, meals, tokens, language, theme, and shared actions for all screens.
+
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { getTranslation } from '@/lib/translations'
 import { paymentMethods, tokenPacks, tokenPlans } from '@/lib/token-plans'

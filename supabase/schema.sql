@@ -1,5 +1,4 @@
-﻿-- Trackily database schema for the Next.js version
--- Run this file in Supabase SQL Editor
+﻿
 
 create table if not exists profiles (
   id uuid references auth.users on delete cascade primary key,
